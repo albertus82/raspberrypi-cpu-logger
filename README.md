@@ -5,11 +5,16 @@ Raspberry Pi CPU Logger
 
 Log [Raspberry Pi](https://www.raspberrypi.org) CPU frequency and temperature to [ThingSpeak](https://thingspeak.com).
 
-## Minimum requirements
+## Requirements
+
+### Mandatory
 
 * Java SE Development Kit 11
-* [Apache Maven](https://maven.apache.org) 3.3.x
 * [ThingSpeak](https://thingspeak.com) account (available for free)
+
+### Recommended
+
+* [Apache Maven](https://maven.apache.org) 3.3.x
 
 ## Download
 
@@ -17,11 +22,17 @@ Log [Raspberry Pi](https://www.raspberrypi.org) CPU frequency and temperature to
 
 ## Build
 
+### Using Maven
+
 `mvn clean test`
+
+### Without Maven
+
+`javac -d target/classes src/main/java/RaspberryPiCpuLogger.java`
 
 ## Usage
 
-`java RaspberryPiCpuLogger WRITE_API_KEY`
+`java -cp target/classes RaspberryPiCpuLogger WRITE_API_KEY`
 
 * `WRITE_API_KEY`: the **Write API Key** associated with your ThingSpeak channel (e.g. `1234567890ABCDEF`).
 
@@ -32,7 +43,7 @@ Log [Raspberry Pi](https://www.raspberrypi.org) CPU frequency and temperature to
 ```sh
 git clone https://github.com/albertus82/raspberrypi-cpu-logger.git
 cd raspberrypi-cpu-logger
-mvn clean test
+javac -d target/classes src/main/java/RaspberryPiCpuLogger.java
 cd target/classes
 java -Xms8m -Xmx32m RaspberryPiCpuLogger WRITE_API_KEY
 ```

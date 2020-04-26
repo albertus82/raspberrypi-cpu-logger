@@ -9,7 +9,7 @@ Log [Raspberry Pi](https://www.raspberrypi.org) CPU frequency and temperature to
 
 ### Mandatory
 
-* Java SE Development Kit 11
+* Java SE Development Kit 11 (e.g.: [BellSoft Liberica](https://bell-sw.com) JDK 11)
 * [ThingSpeak](https://thingspeak.com) account (available for free)
 
 ### Recommended

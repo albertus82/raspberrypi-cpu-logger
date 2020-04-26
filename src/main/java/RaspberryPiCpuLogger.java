@@ -24,7 +24,10 @@ public class RaspberryPiCpuLogger {
 
 	public static void main(final String... args) throws IOException, InterruptedException, URISyntaxException {
 		final String apiKey = args[0];
-		final URI uri = new URI(URL);
+		new RaspberryPiCpuLogger().run(new URI(URL), apiKey);
+	}
+
+	private void run(final URI uri, final String apiKey) throws IOException, InterruptedException {
 		final HttpClient httpClient = HttpClient.newBuilder().build();
 		int errors = 0;
 		while (errors < MAX_ERRORS) {

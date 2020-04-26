@@ -6,7 +6,7 @@
 
 	<groupId>com.example</groupId>
 	<artifactId>raspberrypi-cpu-logger</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0</version>
 
 	<name>Raspberry Pi CPU Logger</name>
 

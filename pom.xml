@@ -5,7 +5,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.example</groupId>
+	<groupId>it.albertus</groupId>
 	<artifactId>raspberrypi-cpu-logger</artifactId>
 	<version>0.1.0</version>
 
@@ -15,6 +15,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.release>11</maven.compiler.release>
+		<maven.version.rules>${project.baseUri}/maven-version-rules.xml</maven.version.rules>
 	</properties>
 
 	<build>
@@ -24,27 +25,18 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 			</plugin>
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>versions-maven-plugin</artifactId>
 				<version>2.7</version>
 				<executions>
 					<execution>
-						<id>plugin</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>display-plugin-updates</goal>
-						</goals>
-					</execution>
-					<execution>
 						<phase>verify</phase>
 						<goals>
 							<goal>display-property-updates</goal>
 							<goal>display-dependency-updates</goal>
 						</goals>
-						<configuration>
-							<rulesUri>${project.baseUri}/maven-version-rules.xml</rulesUri>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>

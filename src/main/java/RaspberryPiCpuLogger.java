@@ -29,36 +29,44 @@ class RaspberryPiCpuLogger {
 		new RaspberryPiCpuLogger().run(new URI(URL), apiKey, Arrays.stream(PATHS).map(Paths::get).toArray(Path[]::new));
 	}
 
-	void run(final URI uri, final String apiKey, final Path... paths) throws IOException, InterruptedException {
+	private void run(final URI uri, final String apiKey, final Path... paths) throws IOException, InterruptedException {
 		final HttpClient httpClient = HttpClient.newBuilder().build();
 		int errors = 0;
 		while (errors < MAX_ERRORS) {
-			final StringBuilder body = new StringBuilder("api_key=").append(apiKey);
-			for (int i = 0; i < paths.length; i++) {
-				body.append("&field").append(i + 1).append('=');
-				try (final BufferedReader reader = Files.newBufferedReader(paths[i], StandardCharsets.US_ASCII)) {
-					body.append(Integer.parseInt(reader.readLine().trim()) / 1000d);
-				}
-			}
-			final HttpRequest request = HttpRequest.newBuilder(uri).POST(BodyPublishers.ofString(body.toString())).timeout(Duration.ofSeconds(HTTP_TIMEOUT)).build();
-			try {
-				final HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
-				final int statusCode = response.statusCode();
-				if (statusCode >= HttpURLConnection.HTTP_OK && statusCode < HttpURLConnection.HTTP_MULT_CHOICE) {
-					errors = 0;
-				}
-				else {
-					errors++;
-					System.err.println(response); // NOSONAR
-				}
-			}
-			catch (final IOException e) {
+			if (post(httpClient, uri, apiKey, paths)) {
 				errors++;
-				e.printStackTrace(); // NOSONAR
 				System.out.println("Error count: " + errors + '/' + MAX_ERRORS); // NOSONAR
+			}
+			else {
+				errors = 0;
 			}
 			TimeUnit.SECONDS.sleep(INTERVAL_SECS);
 		}
+	}
+
+	boolean post(final HttpClient httpClient, final URI uri, final String apiKey, final Path... paths) throws IOException, InterruptedException {
+		boolean error = false;
+		final StringBuilder body = new StringBuilder("api_key=").append(apiKey);
+		for (int i = 0; i < paths.length; i++) {
+			body.append("&field").append(i + 1).append('=');
+			try (final BufferedReader reader = Files.newBufferedReader(paths[i], StandardCharsets.US_ASCII)) {
+				body.append(Integer.parseInt(reader.readLine().trim()) / 1000d);
+			}
+		}
+		final HttpRequest request = HttpRequest.newBuilder(uri).POST(BodyPublishers.ofString(body.toString())).timeout(Duration.ofSeconds(HTTP_TIMEOUT)).build();
+		try {
+			final HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
+			final int statusCode = response.statusCode();
+			if (statusCode < HttpURLConnection.HTTP_OK || statusCode >= HttpURLConnection.HTTP_MULT_CHOICE) {
+				error = true;
+				System.err.println(response); // NOSONAR
+			}
+		}
+		catch (final IOException e) {
+			error = true;
+			e.printStackTrace(); // NOSONAR
+		}
+		return error;
 	}
 
 }

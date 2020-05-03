@@ -10,11 +10,13 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-public class RaspberryPiCpuLogger {
+class RaspberryPiCpuLogger {
 
 	private static final String[] PATHS = { "/sys/class/thermal/thermal_zone0/temp", "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq" };
 	private static final String URL = "https://api.thingspeak.com/update";
@@ -24,17 +26,17 @@ public class RaspberryPiCpuLogger {
 
 	public static void main(final String... args) throws IOException, InterruptedException, URISyntaxException {
 		final String apiKey = args[0];
-		new RaspberryPiCpuLogger().run(new URI(URL), apiKey);
+		new RaspberryPiCpuLogger().run(new URI(URL), apiKey, Arrays.stream(PATHS).map(Paths::get).toArray(Path[]::new));
 	}
 
-	private void run(final URI uri, final String apiKey) throws IOException, InterruptedException {
+	void run(final URI uri, final String apiKey, final Path... paths) throws IOException, InterruptedException {
 		final HttpClient httpClient = HttpClient.newBuilder().build();
 		int errors = 0;
 		while (errors < MAX_ERRORS) {
 			final StringBuilder body = new StringBuilder("api_key=").append(apiKey);
-			for (int i = 0; i < PATHS.length; i++) {
+			for (int i = 0; i < paths.length; i++) {
 				body.append("&field").append(i + 1).append('=');
-				try (final BufferedReader reader = Files.newBufferedReader(Paths.get(PATHS[i]), StandardCharsets.US_ASCII)) {
+				try (final BufferedReader reader = Files.newBufferedReader(paths[i], StandardCharsets.US_ASCII)) {
 					body.append(Integer.parseInt(reader.readLine().trim()) / 1000d);
 				}
 			}

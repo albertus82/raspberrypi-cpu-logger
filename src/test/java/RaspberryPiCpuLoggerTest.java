@@ -44,9 +44,15 @@ class RaspberryPiCpuLoggerTest {
 		boolean error = instance.post(HttpClient.newBuilder().build(), uri, "1234567890ABCDEF", Arrays.stream(PATHS).map(this::fromResource).toArray(Path[]::new));
 		Assertions.assertFalse(error);
 
-		// Test HTTP 500
+		// Test HTTP >=300
 		client.clear(requestExpectation);
-		client.when(new HttpRequest().withMethod("POST")).respond(new HttpResponse().withStatusCode(500));
+		client.when(new HttpRequest().withMethod("POST")).respond(new HttpResponse().withStatusCode(300));
+		error = instance.post(HttpClient.newBuilder().build(), uri, "1234567890ABCDEF", Arrays.stream(PATHS).map(this::fromResource).toArray(Path[]::new));
+		Assertions.assertTrue(error);
+
+		// Test HTTP <200
+		client.clear(requestExpectation);
+		client.when(new HttpRequest().withMethod("POST")).respond(new HttpResponse().withStatusCode(199));
 		error = instance.post(HttpClient.newBuilder().build(), uri, "1234567890ABCDEF", Arrays.stream(PATHS).map(this::fromResource).toArray(Path[]::new));
 		Assertions.assertTrue(error);
 

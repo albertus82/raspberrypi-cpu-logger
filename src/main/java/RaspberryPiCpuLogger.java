@@ -18,7 +18,8 @@ import java.util.concurrent.TimeUnit;
 
 class RaspberryPiCpuLogger {
 
-	private static final String[] PATHS = { "/sys/class/thermal/thermal_zone0/temp", "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq" };
+	static final String[] PATHS = { "/sys/class/thermal/thermal_zone0/temp", "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq" };
+
 	private static final String URL = "https://api.thingspeak.com/update";
 	private static final int INTERVAL_SECS = 15;
 	private static final int MAX_ERRORS = 3600 / INTERVAL_SECS;
@@ -26,22 +27,23 @@ class RaspberryPiCpuLogger {
 
 	public static void main(final String... args) throws IOException, InterruptedException, URISyntaxException {
 		final String apiKey = args[0];
-		new RaspberryPiCpuLogger().run(new URI(URL), apiKey, Arrays.stream(PATHS).map(Paths::get).toArray(Path[]::new));
+		new RaspberryPiCpuLogger().run(MAX_ERRORS, new URI(URL), INTERVAL_SECS, apiKey, Arrays.stream(PATHS).map(Paths::get).toArray(Path[]::new));
 	}
 
-	private void run(final URI uri, final String apiKey, final Path... paths) throws IOException, InterruptedException {
+	int run(final int maxErrors, final URI uri, final int intervalSecs, final String apiKey, final Path... paths) throws IOException, InterruptedException {
 		final HttpClient httpClient = HttpClient.newBuilder().build();
 		int errors = 0;
-		while (errors < MAX_ERRORS) {
+		while (errors < maxErrors) {
 			if (post(httpClient, uri, apiKey, paths)) {
 				errors++;
-				System.out.println("Error count: " + errors + '/' + MAX_ERRORS); // NOSONAR
+				System.out.println("Error count: " + errors + '/' + maxErrors); // NOSONAR
 			}
 			else {
 				errors = 0;
 			}
-			TimeUnit.SECONDS.sleep(INTERVAL_SECS);
+			TimeUnit.SECONDS.sleep(intervalSecs);
 		}
+		return errors;
 	}
 
 	boolean post(final HttpClient httpClient, final URI uri, final String apiKey, final Path... paths) throws IOException, InterruptedException {

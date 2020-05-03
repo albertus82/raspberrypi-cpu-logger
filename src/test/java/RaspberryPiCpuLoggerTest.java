@@ -4,7 +4,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -24,9 +23,10 @@ import org.mockserver.model.MediaType;
 import lombok.SneakyThrows;
 
 @ExtendWith(MockServerExtension.class)
+@Timeout(100)
 class RaspberryPiCpuLoggerTest {
 
-	private static final String[] PATHS = RaspberryPiCpuLogger.PATHS;
+	private static final String[] PATHS = { "/sys/class/thermal/thermal_zone0/temp", "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq" };
 
 	private static final String PATH = "/update";
 
@@ -59,7 +59,6 @@ class RaspberryPiCpuLoggerTest {
 	}
 
 	@Test
-	@Timeout(100)
 	void testRun(final MockServerClient client) throws IOException, InterruptedException, URISyntaxException {
 		final InetSocketAddress remoteAddress = client.remoteAddress();
 		client.when(new HttpRequest().withMethod("POST")).respond(new HttpResponse().withStatusCode(404));
@@ -69,7 +68,6 @@ class RaspberryPiCpuLoggerTest {
 	}
 
 	@Test
-	@Timeout(100)
 	void testPost(final MockServerClient client) throws IOException, InterruptedException, URISyntaxException {
 		final InetSocketAddress remoteAddress = client.remoteAddress();
 		final URI uri = new URI("http", null, remoteAddress.getHostString(), remoteAddress.getPort(), PATH, null, null);
@@ -100,7 +98,7 @@ class RaspberryPiCpuLoggerTest {
 
 	@SneakyThrows(URISyntaxException.class)
 	private static Path getResourcePath(final String resourceName) {
-		return Paths.get(RaspberryPiCpuLoggerTest.class.getResource(resourceName).toURI());
+		return Path.of(RaspberryPiCpuLoggerTest.class.getResource(resourceName).toURI());
 	}
 
 }

@@ -11,15 +11,13 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 class RaspberryPiCpuLogger {
 
-	static final String[] PATHS = { "/sys/class/thermal/thermal_zone0/temp", "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq" };
-
+	private static final String[] PATHS = { "/sys/class/thermal/thermal_zone0/temp", "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq" };
 	private static final String URL = "https://api.thingspeak.com/update";
 	private static final int INTERVAL_SECS = 15;
 	private static final int MAX_ERRORS = 3600 / INTERVAL_SECS;
@@ -27,7 +25,7 @@ class RaspberryPiCpuLogger {
 
 	public static void main(final String... args) throws IOException, InterruptedException, URISyntaxException {
 		final String apiKey = args[0];
-		new RaspberryPiCpuLogger().run(MAX_ERRORS, new URI(URL), INTERVAL_SECS, apiKey, Arrays.stream(PATHS).map(Paths::get).toArray(Path[]::new));
+		new RaspberryPiCpuLogger().run(MAX_ERRORS, new URI(URL), INTERVAL_SECS, apiKey, Arrays.stream(PATHS).map(Path::of).toArray(Path[]::new));
 	}
 
 	int run(final int maxErrors, final URI uri, final int intervalSecs, final String apiKey, final Path... paths) throws IOException, InterruptedException {

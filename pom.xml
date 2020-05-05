@@ -16,6 +16,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.release>11</maven.compiler.release>
 		<maven.version.rules>${project.baseUri}/maven-version-rules.xml</maven.version.rules>
+		<sonar.java.source>${maven.compiler.release}</sonar.java.source>
 	</properties>
 
 	<build>

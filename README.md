@@ -62,7 +62,7 @@ echo WRITE_API_KEY | sudo tee api.key
 sudo chmod 640 api.key
 sudo mvn clean test
 printf '#!/bin/sh\njava -Xms8m -Xmx32m -cp target/classes RaspberryPiCpuLogger api.key\n' | sudo tee runsvc.sh
-sudo chmod +x runsvc.sh
+sudo chmod 754 runsvc.sh
 printf '[Unit]\nDescription=CPU Logger\nAfter=network.target\n\n[Service]\nExecStart=/opt/raspberrypi-cpu-logger/runsvc.sh\nUser=root\nWorkingDirectory=/opt/raspberrypi-cpu-logger/\nKillMode=control-group\nKillSignal=SIGTERM\nTimeoutStopSec=5min\n\n[Install]\nWantedBy=multi-user.target\n' | sudo tee /etc/systemd/system/raspberrypi-cpu-logger.service
 sudo systemctl enable raspberrypi-cpu-logger
 sudo service raspberrypi-cpu-logger restart

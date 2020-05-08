@@ -44,10 +44,9 @@ Log [Raspberry Pi](https://www.raspberrypi.org) CPU frequency and temperature to
 ```sh
 git clone https://github.com/albertus82/raspberrypi-cpu-logger.git
 cd raspberrypi-cpu-logger
-echo WRITE_API_KEY | tee api.key
+echo WRITE_API_KEY > api.key
 javac -d target/classes src/main/java/RaspberryPiCpuLogger.java
-cd target/classes
-java -Xms8m -Xmx32m RaspberryPiCpuLogger api.key
+./run.sh
 ```
 
 ## Install as a service
@@ -61,9 +60,7 @@ cd raspberrypi-cpu-logger
 echo WRITE_API_KEY | sudo tee api.key
 sudo chmod 640 api.key
 sudo mvn clean test
-printf '#!/bin/sh\njava -Xms8m -Xmx32m -cp target/classes RaspberryPiCpuLogger api.key\n' | sudo tee runsvc.sh
-sudo chmod 754 runsvc.sh
-printf '[Unit]\nDescription=CPU Logger\nAfter=network.target\n\n[Service]\nExecStart=/opt/raspberrypi-cpu-logger/runsvc.sh\nUser=root\nWorkingDirectory=/opt/raspberrypi-cpu-logger/\nKillMode=control-group\nKillSignal=SIGTERM\nTimeoutStopSec=5min\n\n[Install]\nWantedBy=multi-user.target\n' | sudo tee /etc/systemd/system/raspberrypi-cpu-logger.service
+printf '[Unit]\nDescription=CPU Logger\nAfter=network.target\n\n[Service]\nExecStart=/opt/raspberrypi-cpu-logger/run.sh\nUser=root\nWorkingDirectory=/opt/raspberrypi-cpu-logger/\nKillMode=control-group\nKillSignal=SIGTERM\nTimeoutStopSec=5min\n\n[Install]\nWantedBy=multi-user.target\n' | sudo tee /etc/systemd/system/raspberrypi-cpu-logger.service
 sudo systemctl enable raspberrypi-cpu-logger
 sudo service raspberrypi-cpu-logger restart
 ```

@@ -3,9 +3,12 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.security.InvalidKeyException;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.Set;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -14,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.junit.jupiter.MockServerExtension;
 import org.mockserver.model.HttpRequest;
@@ -56,14 +60,33 @@ class RaspberryPiCpuLoggerTest {
 	@Test
 	void testMain() {
 		Assertions.assertThrows(RuntimeException.class, RaspberryPiCpuLogger::main);
+		Assertions.assertThrows(NoSuchFileException.class, new Executable() {
+			@Override
+			public void execute() throws InvalidKeyException, IOException, InterruptedException, URISyntaxException {
+				RaspberryPiCpuLogger.main("qwertyuiop");
+			}
+		});
 	}
 
 	@Test
-	void testRun(final MockServerClient client) throws IOException, InterruptedException, URISyntaxException {
+	void testLoadApiKey() throws InvalidKeyException, IOException, URISyntaxException {
+		for (final String resourceName : new String[] { "apikey1.txt", "apikey2.txt", "apikey3.txt" }) {
+			Assertions.assertEquals("1234567890ABCDEF", instance.loadApiKey(Path.of(getClass().getResource(resourceName).toURI())));
+		}
+		Set.of("empty1.txt", "empty2.txt").parallelStream().forEach(e -> Assertions.assertThrows(InvalidKeyException.class, new Executable() {
+			@Override
+			public void execute() throws InvalidKeyException, IOException, URISyntaxException {
+				instance.loadApiKey(Path.of(getClass().getResource(e).toURI()));
+			}
+		}));
+	}
+
+	@Test
+	void testRun(final MockServerClient client) throws IOException, InterruptedException, URISyntaxException, InvalidKeyException {
 		final InetSocketAddress remoteAddress = client.remoteAddress();
 		client.when(new HttpRequest().withMethod("POST")).respond(new HttpResponse().withStatusCode(404));
 		final URI uri = new URI("http", null, remoteAddress.getHostString(), remoteAddress.getPort(), PATH, null, null);
-		int errors = instance.run(3, uri, 1, "1234567890ABCDEF", Arrays.stream(PATHS).map(RaspberryPiCpuLoggerTest::getResourcePath).toArray(Path[]::new));
+		int errors = instance.run(3, uri, 1, Path.of(getClass().getResource("apikey1.txt").toURI()), Arrays.stream(PATHS).map(RaspberryPiCpuLoggerTest::getResourcePath).toArray(Path[]::new));
 		Assertions.assertEquals(3, errors);
 	}
 

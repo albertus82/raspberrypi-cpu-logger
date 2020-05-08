@@ -11,6 +11,7 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.InvalidKeyException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -23,16 +24,16 @@ class RaspberryPiCpuLogger {
 	private static final int MAX_ERRORS = 3600 / INTERVAL_SECS;
 	private static final int HTTP_TIMEOUT = 15;
 
-	public static void main(final String... args) throws IOException, InterruptedException, URISyntaxException {
-		final String apiKey = args[0];
-		new RaspberryPiCpuLogger().run(MAX_ERRORS, new URI(URL), INTERVAL_SECS, apiKey, Arrays.stream(PATHS).map(Path::of).toArray(Path[]::new));
+	public static void main(final String... args) throws IOException, InterruptedException, URISyntaxException, InvalidKeyException {
+		new RaspberryPiCpuLogger().run(MAX_ERRORS, new URI(URL), INTERVAL_SECS, Path.of(args[0]), Arrays.stream(PATHS).map(Path::of).toArray(Path[]::new));
 	}
 
-	int run(final int maxErrors, final URI uri, final int intervalSecs, final String apiKey, final Path... paths) throws IOException, InterruptedException {
+	int run(final int maxErrors, final URI uri, final int intervalSecs, final Path apiKeyPath, final Path... dataPaths) throws IOException, InterruptedException, InvalidKeyException {
+		final String apiKey = loadApiKey(apiKeyPath);
 		final HttpClient httpClient = HttpClient.newBuilder().build();
 		int errors = 0;
 		while (errors < maxErrors) {
-			if (post(httpClient, uri, apiKey, paths)) {
+			if (post(httpClient, uri, apiKey, dataPaths)) {
 				errors++;
 				System.out.println("Error count: " + errors + '/' + maxErrors); // NOSONAR
 			}
@@ -67,6 +68,19 @@ class RaspberryPiCpuLogger {
 			e.printStackTrace(); // NOSONAR
 		}
 		return error;
+	}
+
+	String loadApiKey(final Path path) throws IOException, InvalidKeyException {
+		try (final BufferedReader br = Files.newBufferedReader(path)) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				final String trimmed = line.trim();
+				if (!trimmed.isEmpty()) {
+					return trimmed;
+				}
+			}
+		}
+		throw new InvalidKeyException();
 	}
 
 }

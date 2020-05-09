@@ -34,7 +34,7 @@ class RaspberryPiCpuLogger {
 		}
 		catch (final Exception e) {
 			log.log(Level.SEVERE, e.toString(), e);
-			throw e;
+			System.exit(1);
 		}
 	}
 

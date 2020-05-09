@@ -15,7 +15,9 @@ import java.security.InvalidKeyException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 class RaspberryPiCpuLogger {
@@ -29,8 +31,14 @@ class RaspberryPiCpuLogger {
 	private static final Logger log = Logger.getLogger(RaspberryPiCpuLogger.class.getName());
 
 	public static void main(final String... args) throws IOException, InterruptedException, URISyntaxException, InvalidKeyException {
+		final String pattern = LogManager.getLogManager().getProperty(FileHandler.class.getName() + ".pattern");
+		if (pattern != null) {
+			final Path parent = Path.of(pattern).getParent();
+			if (parent != null) {
+				Files.createDirectories(parent);
+			}
+		}
 		try {
-			Files.createDirectories(Path.of("logs"));
 			new RaspberryPiCpuLogger().run(MAX_ERRORS, new URI(URL), INTERVAL_SECS, Path.of(args[0]), Arrays.stream(PATHS).map(Path::of).toArray(Path[]::new));
 		}
 		catch (final Exception e) {

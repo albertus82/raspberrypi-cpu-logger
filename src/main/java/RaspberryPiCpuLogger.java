@@ -15,6 +15,8 @@ import java.security.InvalidKeyException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class RaspberryPiCpuLogger {
 
@@ -24,8 +26,16 @@ class RaspberryPiCpuLogger {
 	private static final int MAX_ERRORS = 3600 / INTERVAL_SECS;
 	private static final int HTTP_TIMEOUT = 15;
 
+	private static final Logger log = Logger.getLogger(RaspberryPiCpuLogger.class.getName());
+
 	public static void main(final String... args) throws IOException, InterruptedException, URISyntaxException, InvalidKeyException {
-		new RaspberryPiCpuLogger().run(MAX_ERRORS, new URI(URL), INTERVAL_SECS, Path.of(args[0]), Arrays.stream(PATHS).map(Path::of).toArray(Path[]::new));
+		try {
+			new RaspberryPiCpuLogger().run(MAX_ERRORS, new URI(URL), INTERVAL_SECS, Path.of(args[0]), Arrays.stream(PATHS).map(Path::of).toArray(Path[]::new));
+		}
+		catch (final Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
+			throw e;
+		}
 	}
 
 	int run(final int maxErrors, final URI uri, final int intervalSecs, final Path apiKeyPath, final Path... dataPaths) throws IOException, InterruptedException, InvalidKeyException {
@@ -35,7 +45,7 @@ class RaspberryPiCpuLogger {
 		while (errors < maxErrors) {
 			if (post(httpClient, uri, apiKey, dataPaths)) {
 				errors++;
-				System.out.println("Error count: " + errors + '/' + maxErrors);
+				log.log(Level.WARNING, "Error count: {0,number,#}/{1,number,#}", new Integer[] { errors, maxErrors });
 			}
 			else {
 				errors = 0;
@@ -55,17 +65,21 @@ class RaspberryPiCpuLogger {
 			}
 		}
 		final HttpRequest request = HttpRequest.newBuilder(uri).POST(BodyPublishers.ofString(body.toString())).timeout(Duration.ofSeconds(HTTP_TIMEOUT)).build();
+		log.log(Level.FINE, "{0}", request);
 		try {
 			final HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
 			final int statusCode = response.statusCode();
 			if (statusCode < HttpURLConnection.HTTP_OK || statusCode >= HttpURLConnection.HTTP_MULT_CHOICE) {
 				error = true;
-				System.err.println(response);
+				log.log(Level.SEVERE, "{0}", response);
+			}
+			else {
+				log.log(Level.FINE, "{0}", response);
 			}
 		}
 		catch (final IOException e) {
 			error = true;
-			e.printStackTrace();
+			log.log(Level.SEVERE, e.toString(), e);
 		}
 		return error;
 	}

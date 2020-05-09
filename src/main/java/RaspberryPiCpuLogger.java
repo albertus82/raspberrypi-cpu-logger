@@ -35,7 +35,7 @@ class RaspberryPiCpuLogger {
 		while (errors < maxErrors) {
 			if (post(httpClient, uri, apiKey, dataPaths)) {
 				errors++;
-				System.out.println("Error count: " + errors + '/' + maxErrors); // NOSONAR
+				System.out.println("Error count: " + errors + '/' + maxErrors);
 			}
 			else {
 				errors = 0;
@@ -60,12 +60,12 @@ class RaspberryPiCpuLogger {
 			final int statusCode = response.statusCode();
 			if (statusCode < HttpURLConnection.HTTP_OK || statusCode >= HttpURLConnection.HTTP_MULT_CHOICE) {
 				error = true;
-				System.err.println(response); // NOSONAR
+				System.err.println(response);
 			}
 		}
 		catch (final IOException e) {
 			error = true;
-			e.printStackTrace(); // NOSONAR
+			e.printStackTrace();
 		}
 		return error;
 	}

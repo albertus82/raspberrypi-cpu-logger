@@ -30,6 +30,7 @@ class RaspberryPiCpuLogger {
 
 	public static void main(final String... args) throws IOException, InterruptedException, URISyntaxException, InvalidKeyException {
 		try {
+			Files.createDirectory(Path.of("logs"));
 			new RaspberryPiCpuLogger().run(MAX_ERRORS, new URI(URL), INTERVAL_SECS, Path.of(args[0]), Arrays.stream(PATHS).map(Path::of).toArray(Path[]::new));
 		}
 		catch (final Exception e) {

@@ -26,7 +26,7 @@ class RaspberryPiCpuLogger {
 	private static final String URL = "https://api.thingspeak.com/update";
 	private static final int INTERVAL_SECS = 15;
 	private static final int MAX_ERRORS = 3600 / INTERVAL_SECS;
-	private static final int HTTP_TIMEOUT = 15;
+	private static final int HTTP_TIMEOUT_SECS = 15;
 
 	private static final Logger log = Logger.getLogger(RaspberryPiCpuLogger.class.getName());
 
@@ -73,7 +73,7 @@ class RaspberryPiCpuLogger {
 				body.append(Integer.parseInt(reader.readLine().trim()) / 1000d);
 			}
 		}
-		final HttpRequest request = HttpRequest.newBuilder(uri).POST(BodyPublishers.ofString(body.toString())).timeout(Duration.ofSeconds(HTTP_TIMEOUT)).build();
+		final HttpRequest request = HttpRequest.newBuilder(uri).POST(BodyPublishers.ofString(body.toString())).timeout(Duration.ofSeconds(HTTP_TIMEOUT_SECS)).build();
 		log.log(Level.FINE, "{0}", request);
 		try {
 			final HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());

@@ -62,7 +62,7 @@ cd raspberrypi-cpu-logger
 echo WRITE_API_KEY | sudo tee conf/api.key
 sudo chmod 640 conf/api.key
 sudo mvn clean test
-printf '[Unit]\nDescription=CPU Logger\nAfter=network.target\n\n[Service]\nExecStart=/opt/raspberrypi-cpu-logger/start.sh\nUser=root\nKillMode=control-group\nKillSignal=SIGTERM\nTimeoutStopSec=5min\n\n[Install]\nWantedBy=multi-user.target\n' | sudo tee /etc/systemd/system/raspberrypi-cpu-logger.service
+printf '[Unit]\nDescription=CPU Logger\nAfter=network.target\n\n[Service]\nExecStart=/opt/raspberrypi-cpu-logger/start.sh\nUser=root\nTimeoutStopSec=5min\n\n[Install]\nWantedBy=multi-user.target\n' | sudo tee /etc/systemd/system/raspberrypi-cpu-logger.service
 sudo systemctl enable raspberrypi-cpu-logger
 sudo service raspberrypi-cpu-logger restart
 ```

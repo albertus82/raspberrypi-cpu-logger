@@ -1,3 +1,8 @@
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -14,9 +19,9 @@ import java.nio.file.Path;
 import java.security.InvalidKeyException;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.FileHandler;
-import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -30,6 +35,8 @@ class RaspberryPiCpuLogger {
 
 	private static final Logger log = Logger.getLogger(RaspberryPiCpuLogger.class.getName());
 
+	private static volatile boolean shutdown;
+
 	public static void main(final String... args) throws IOException, InterruptedException, URISyntaxException, InvalidKeyException {
 		final String pattern = LogManager.getLogManager().getProperty(FileHandler.class.getName() + ".pattern");
 		if (pattern != null) {
@@ -38,11 +45,24 @@ class RaspberryPiCpuLogger {
 				Files.createDirectories(parent);
 			}
 		}
+
+		log.log(INFO, "Started on {0}.", new Date());
+
+		final Thread shutdownHook = new Thread(() -> {
+			log.log(INFO, "Shutdown on {0}.", new Date());
+			shutdown = true;
+		});
+		shutdownHook.setPriority(Thread.MAX_PRIORITY);
+		Runtime.getRuntime().addShutdownHook(shutdownHook);
+
 		try {
 			new RaspberryPiCpuLogger().run(MAX_ERRORS, new URI(URL), INTERVAL_SECS, Path.of(args[0]), Arrays.stream(PATHS).map(Path::of).toArray(Path[]::new));
 		}
+		catch (final InterruptedException e) {
+			log.log(INFO, e.toString(), e);
+		}
 		catch (final Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			log.log(SEVERE, e.toString(), e);
 			throw e;
 		}
 	}
@@ -51,10 +71,10 @@ class RaspberryPiCpuLogger {
 		final String apiKey = loadApiKey(apiKeyPath);
 		final HttpClient httpClient = HttpClient.newBuilder().build();
 		int errors = 0;
-		while (errors < maxErrors) {
+		while (errors < maxErrors && !shutdown) {
 			if (post(httpClient, uri, apiKey, dataPaths)) {
 				errors++;
-				log.log(Level.WARNING, "Error count: {0,number,#}/{1,number,#}", new Integer[] { errors, maxErrors });
+				log.log(WARNING, "Error count: {0,number,#}/{1,number,#}", new Integer[] { errors, maxErrors });
 			}
 			else {
 				errors = 0;
@@ -74,21 +94,21 @@ class RaspberryPiCpuLogger {
 			}
 		}
 		final HttpRequest request = HttpRequest.newBuilder(uri).POST(BodyPublishers.ofString(body.toString())).timeout(Duration.ofSeconds(HTTP_TIMEOUT_SECS)).build();
-		log.log(Level.FINE, "{0}", request);
+		log.log(FINE, "{0}", request);
 		try {
 			final HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
 			final int statusCode = response.statusCode();
 			if (statusCode < HttpURLConnection.HTTP_OK || statusCode >= HttpURLConnection.HTTP_MULT_CHOICE) {
 				error = true;
-				log.log(Level.SEVERE, "{0}", response);
+				log.log(SEVERE, "{0}", response);
 			}
 			else {
-				log.log(Level.FINE, "{0}", response);
+				log.log(FINE, "{0}", response);
 			}
 		}
 		catch (final IOException e) {
 			error = true;
-			log.log(Level.SEVERE, e.toString(), e);
+			log.log(SEVERE, e.toString(), e);
 		}
 		return error;
 	}

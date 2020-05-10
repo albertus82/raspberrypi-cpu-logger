@@ -59,7 +59,8 @@ class RaspberryPiCpuLogger {
 			new RaspberryPiCpuLogger().run(MAX_ERRORS, new URI(URL), INTERVAL_SECS, Path.of(args[0]), Arrays.stream(PATHS).map(Path::of).toArray(Path[]::new));
 		}
 		catch (final InterruptedException e) {
-			log.log(INFO, e.toString(), e);
+			log.log(FINE, e.toString(), e);
+			throw e;
 		}
 		catch (final Exception e) {
 			log.log(SEVERE, e.toString(), e);

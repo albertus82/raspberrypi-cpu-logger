@@ -37,7 +37,7 @@ Put the **Write API Key** associated with your ThingSpeak channel (e.g. `1234567
 
 ## Usage
 
-Launch the program via the shell script `./raspberrypi-cpu-logger.sh` and use CTRL+C to terminate, or install the program as a service (see below).
+Launch the program via the shell script `start.sh` and use CTRL+C to terminate, or install the program as a service (see below).
 
 ## Example
 
@@ -48,7 +48,7 @@ git clone https://github.com/albertus82/raspberrypi-cpu-logger.git
 cd raspberrypi-cpu-logger
 echo WRITE_API_KEY > conf/api.key
 javac -d target/classes src/main/java/RaspberryPiCpuLogger.java
-./raspberrypi-cpu-logger.sh
+./start.sh
 ```
 
 ## Install as a service
@@ -62,7 +62,7 @@ cd raspberrypi-cpu-logger
 echo WRITE_API_KEY | sudo tee conf/api.key
 sudo chmod 640 conf/api.key
 sudo mvn clean test
-printf '[Unit]\nDescription=CPU Logger\nAfter=network.target\n\n[Service]\nExecStart=/opt/raspberrypi-cpu-logger/raspberrypi-cpu-logger.sh\nUser=root\nKillMode=control-group\nKillSignal=SIGTERM\nTimeoutStopSec=5min\n\n[Install]\nWantedBy=multi-user.target\n' | sudo tee /etc/systemd/system/raspberrypi-cpu-logger.service
+printf '[Unit]\nDescription=CPU Logger\nAfter=network.target\n\n[Service]\nExecStart=/opt/raspberrypi-cpu-logger/start.sh\nUser=root\nKillMode=control-group\nKillSignal=SIGTERM\nTimeoutStopSec=5min\n\n[Install]\nWantedBy=multi-user.target\n' | sudo tee /etc/systemd/system/raspberrypi-cpu-logger.service
 sudo systemctl enable raspberrypi-cpu-logger
 sudo service raspberrypi-cpu-logger restart
 ```

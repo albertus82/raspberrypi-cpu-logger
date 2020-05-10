@@ -37,7 +37,7 @@ Put the **Write API Key** associated with your ThingSpeak channel (e.g. `1234567
 
 ## Usage
 
-Launch the program via the shell script `start.sh` and use CTRL+C to terminate, or install the program as a service (see below).
+Launch the program via the shell script `start.sh` and use CTRL+C to terminate, or [install the program as a service](#install-as-a-service).
 
 ## Example
 

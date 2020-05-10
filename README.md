@@ -61,7 +61,7 @@ sudo git clone https://github.com/albertus82/raspberrypi-cpu-logger.git
 cd raspberrypi-cpu-logger
 echo WRITE_API_KEY | sudo tee conf/api.key
 sudo chmod 640 conf/api.key
-sudo mvn clean test
+sudo mvn clean test || sudo javac -d target/classes src/main/java/RaspberryPiCpuLogger.java
 printf '[Unit]\nDescription=CPU Logger\nAfter=network.target\n\n[Service]\nExecStart=/opt/raspberrypi-cpu-logger/start.sh\nUser=root\nTimeoutStopSec=5min\n\n[Install]\nWantedBy=multi-user.target\n' | sudo tee /etc/systemd/system/raspberrypi-cpu-logger.service
 sudo systemctl enable raspberrypi-cpu-logger
 sudo service raspberrypi-cpu-logger restart

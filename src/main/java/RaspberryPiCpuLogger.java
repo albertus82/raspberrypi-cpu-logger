@@ -74,11 +74,11 @@ class RaspberryPiCpuLogger {
 		int errors = 0;
 		while (errors < maxErrors && !shutdown) {
 			if (post(httpClient, uri, apiKey, dataPaths)) {
-				errors++;
-				log.log(WARNING, "Error count: {0,number,#}/{1,number,#}", new Integer[] { errors, maxErrors });
+				errors = 0;
 			}
 			else {
-				errors = 0;
+				errors++;
+				log.log(WARNING, "Error count: {0,number,#}/{1,number,#}", new Integer[] { errors, maxErrors });
 			}
 			TimeUnit.SECONDS.sleep(intervalSecs);
 		}
@@ -86,7 +86,7 @@ class RaspberryPiCpuLogger {
 	}
 
 	boolean post(final HttpClient httpClient, final URI uri, final String apiKey, final Path... paths) throws IOException, InterruptedException {
-		boolean error = false;
+		boolean success = true;
 		final StringBuilder body = new StringBuilder("api_key=").append(apiKey);
 		for (int i = 0; i < paths.length; i++) {
 			body.append("&field").append(i + 1).append('=');
@@ -100,7 +100,7 @@ class RaspberryPiCpuLogger {
 			final HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
 			final int statusCode = response.statusCode();
 			if (statusCode < HttpURLConnection.HTTP_OK || statusCode >= HttpURLConnection.HTTP_MULT_CHOICE) {
-				error = true;
+				success = false;
 				log.log(SEVERE, "{0}", response);
 			}
 			else {
@@ -108,10 +108,10 @@ class RaspberryPiCpuLogger {
 			}
 		}
 		catch (final IOException e) {
-			error = true;
+			success = false;
 			log.log(SEVERE, e.toString(), e);
 		}
-		return error;
+		return success;
 	}
 
 	String loadApiKey(final Path path) throws IOException, InvalidKeyException {

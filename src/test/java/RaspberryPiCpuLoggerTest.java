@@ -48,8 +48,8 @@ class RaspberryPiCpuLoggerTest {
 		final InetSocketAddress remoteAddress = client.remoteAddress();
 		client.stop();
 		final URI uri = new URI("http", null, remoteAddress.getHostString(), remoteAddress.getPort(), PATH, null, null);
-		final boolean error = instance.post(HttpClient.newBuilder().build(), uri, "1234567890ABCDEF", Arrays.stream(PATHS).map(RaspberryPiCpuLoggerTest::getResourcePath).toArray(Path[]::new));
-		Assertions.assertTrue(error);
+		final boolean success = instance.post(HttpClient.newBuilder().build(), uri, "1234567890ABCDEF", Arrays.stream(PATHS).map(RaspberryPiCpuLoggerTest::getResourcePath).toArray(Path[]::new));
+		Assertions.assertFalse(success);
 	}
 
 	@BeforeEach
@@ -99,24 +99,24 @@ class RaspberryPiCpuLoggerTest {
 		final HttpRequest requestExpectation = new HttpRequest().withMethod("POST").withPath(PATH).withBody("api_key=1234567890ABCDEF&field1=" + 12345 / 1000d + "&field2=" + 654321 / 1000d);
 		final HttpResponse responseExpectation = new HttpResponse().withStatusCode(200).withBody(Integer.toString(new Random().nextInt()), MediaType.PLAIN_TEXT_UTF_8);
 		client.when(requestExpectation).respond(responseExpectation);
-		boolean error = instance.post(HttpClient.newBuilder().build(), uri, "1234567890ABCDEF", Arrays.stream(PATHS).map(RaspberryPiCpuLoggerTest::getResourcePath).toArray(Path[]::new));
-		Assertions.assertFalse(error);
+		boolean success = instance.post(HttpClient.newBuilder().build(), uri, "1234567890ABCDEF", Arrays.stream(PATHS).map(RaspberryPiCpuLoggerTest::getResourcePath).toArray(Path[]::new));
+		Assertions.assertTrue(success);
 
 		// Test HTTP >2xx
 		client.reset();
 		client.when(new HttpRequest().withMethod("POST")).respond(new HttpResponse().withStatusCode(300));
-		error = instance.post(HttpClient.newBuilder().build(), uri, "1234567890ABCDEF", Arrays.stream(PATHS).map(RaspberryPiCpuLoggerTest::getResourcePath).toArray(Path[]::new));
-		Assertions.assertTrue(error);
+		success = instance.post(HttpClient.newBuilder().build(), uri, "1234567890ABCDEF", Arrays.stream(PATHS).map(RaspberryPiCpuLoggerTest::getResourcePath).toArray(Path[]::new));
+		Assertions.assertFalse(success);
 		client.reset();
 		client.when(new HttpRequest().withMethod("POST")).respond(new HttpResponse().withStatusCode(500));
-		error = instance.post(HttpClient.newBuilder().build(), uri, "1234567890ABCDEF", Arrays.stream(PATHS).map(RaspberryPiCpuLoggerTest::getResourcePath).toArray(Path[]::new));
-		Assertions.assertTrue(error);
+		success = instance.post(HttpClient.newBuilder().build(), uri, "1234567890ABCDEF", Arrays.stream(PATHS).map(RaspberryPiCpuLoggerTest::getResourcePath).toArray(Path[]::new));
+		Assertions.assertFalse(success);
 
 		// Test HTTP <2xx
 		client.reset();
 		client.when(new HttpRequest().withMethod("POST")).respond(new HttpResponse().withStatusCode(101));
-		error = instance.post(HttpClient.newBuilder().build(), uri, "1234567890ABCDEF", Arrays.stream(PATHS).map(RaspberryPiCpuLoggerTest::getResourcePath).toArray(Path[]::new));
-		Assertions.assertTrue(error);
+		success = instance.post(HttpClient.newBuilder().build(), uri, "1234567890ABCDEF", Arrays.stream(PATHS).map(RaspberryPiCpuLoggerTest::getResourcePath).toArray(Path[]::new));
+		Assertions.assertFalse(success);
 	}
 
 	@SneakyThrows(URISyntaxException.class)

@@ -11,4 +11,4 @@ while [ -h "$PRG" ] ; do
 done
 PRGDIR=`dirname "$PRG"`
 
-cd "$PRGDIR" && java -Xms8m -Xmx36m -classpath target/classes -Djava.util.logging.config.file=conf/logging.properties RaspberryPiCpuLogger conf/api.key
+cd "$PRGDIR" && java -Xms8m -Xmx36m -Djava.util.logging.config.file=conf/logging.properties src/main/java/RaspberryPiCpuLogger.java conf/api.key

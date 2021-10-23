@@ -1,9 +1,9 @@
-.project
-.classpath
-.settings/
-/target/
-/bin/
 *.key
-*.log
 *.lck
 *.versionsBackup
+.classpath
+.project
+.settings/
+/bin/
+/logs/
+/target/

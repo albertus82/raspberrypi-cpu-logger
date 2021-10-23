@@ -5,7 +5,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>it.albertus</groupId>
+	<groupId>io.github.albertus82</groupId>
 	<artifactId>raspberrypi-cpu-logger</artifactId>
 	<version>0.2.0</version>
 	<name>Raspberry Pi CPU Logger</name>
@@ -100,7 +100,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.20</version>
+			<version>1.18.22</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

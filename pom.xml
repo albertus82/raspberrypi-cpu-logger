@@ -12,6 +12,19 @@
 	<url>https://github.com/albertus82/raspberrypi-cpu-logger</url>
 	<description>Send Raspberry Pi CPU frequency and temperature to ThingSpeak.</description>
 
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/licenses/MIT</url>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:git:https://github.com/albertus82/raspberrypi-cpu-logger.git</connection>
+		<developerConnection>scm:git:https://github.com/albertus82/raspberrypi-cpu-logger.git</developerConnection>
+		<url>https://github.com/albertus82/raspberrypi-cpu-logger</url>
+	</scm>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.release>11</maven.compiler.release>

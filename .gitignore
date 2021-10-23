@@ -6,3 +6,4 @@
 *.key
 *.log
 *.lck
+*.versionsBackup

@@ -2,7 +2,6 @@ Raspberry Pi CPU Logger
 =======================
 
 [![Build status](https://github.com/albertus82/raspberrypi-cpu-logger/workflows/build/badge.svg)](https://github.com/albertus82/raspberrypi-cpu-logger/actions)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=it.albertus%3Araspberrypi-cpu-logger&metric=alert_status)](https://sonarcloud.io/dashboard?id=it.albertus%3Araspberrypi-cpu-logger)
 [![Known Vulnerabilities](https://snyk.io/test/github/albertus82/raspberrypi-cpu-logger/badge.svg?targetFile=pom.xml)](https://snyk.io/test/github/albertus82/raspberrypi-cpu-logger?targetFile=pom.xml)
 
 Log [Raspberry Pi](https://www.raspberrypi.org) CPU frequency and temperature to [ThingSpeak](https://thingspeak.com).

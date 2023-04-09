@@ -24,8 +24,6 @@ import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 import org.mockserver.model.MediaType;
 
-import lombok.SneakyThrows;
-
 @ExtendWith(MockServerExtension.class)
 @Timeout(100)
 class RaspberryPiCpuLoggerTest {
@@ -119,9 +117,13 @@ class RaspberryPiCpuLoggerTest {
 		Assertions.assertFalse(success);
 	}
 
-	@SneakyThrows(URISyntaxException.class)
 	private static Path getResourcePath(final String resourceName) {
-		return Path.of(RaspberryPiCpuLoggerTest.class.getResource(resourceName).toURI());
+		try {
+			return Path.of(RaspberryPiCpuLoggerTest.class.getResource(resourceName).toURI());
+		}
+		catch (final URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

@@ -11,8 +11,6 @@ jobs:
         java: [ '11', '17', '19', '20-ea', '21-ea' ]
         os: [ windows-latest, ubuntu-latest, macOS-latest ]
     runs-on: ${{ matrix.os }}
-    env:
-      MAVEN_OPTS: -Dhttp.keepAlive=false
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-java@v3

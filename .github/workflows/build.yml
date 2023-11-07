@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [ '11', '17', '19', '20-ea', '21-ea' ]
+        java: [ '11', '17', '21', '22-ea' ]
         os: [ windows-latest, ubuntu-latest, macOS-latest ]
     runs-on: ${{ matrix.os }}
     steps:

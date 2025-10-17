@@ -28,7 +28,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.release>11</maven.compiler.release>
-		<org.bouncycastle.version>1.78.1</org.bouncycastle.version>
+		<org.bouncycastle.version>1.79</org.bouncycastle.version>
 		<maven.version.rules>${project.baseUri}/maven-version-rules.xml</maven.version.rules>
 		<sonar.java.source>${maven.compiler.release}</sonar.java.source>
 	</properties>

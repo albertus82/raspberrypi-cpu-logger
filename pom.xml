@@ -57,7 +57,7 @@
 						<configuration>
 							<rules>
 								<requireJavaVersion>
-									<version>${maven.compiler.release}</version>
+									<version>17</version>
 								</requireJavaVersion>
 								<requireMavenVersion>
 									<version>3.6.3</version>
